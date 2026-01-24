@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<IATA_AIDX_FlightLegRS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" TimeStamp="2024-12-03T23:17:12.0397454+01:00" Version="14.1" xmlns="http://www.iata.org/IATA/2007/00">
+  <FlightLeg>
+    <LegIdentifier>
+      <Airline CodeContext="3">AH</Airline>
+      <FlightNumber>1216</FlightNumber>
+      <DepartureAirport CodeContext="3">ALG</DepartureAirport>
+      <ArrivalAirport CodeContext="3">ETZ</ArrivalAirport>
+      <OriginDate>2024-12-04</OriginDate>
+    </LegIdentifier>
+    <LegData>
+      <PublicStatus CodeContext="1245">SCT</PublicStatus>
+      <OperatingAlliance xsi:nil="true" />
+      <ServiceType />
+      <EstFlightDuration xsi:nil="true" />
+      <OwnerAirline xsi:nil="true" />
+      <CabinClass>
+        <PaxCount xsi:nil="true" />
+        <SeatCapacity xsi:nil="true" />
+      </CabinClass>
+      <AssociatedFlightLegSchedule RepeatIndex="1">
+        <DepartureAirport CodeContext="3">ALG</DepartureAirport>
+        <ArrivalAirport CodeContext="3">ETZ</ArrivalAirport>
+      </AssociatedFlightLegSchedule>
+      <RemarkFreeText xsi:nil="true" />
+      <AirportResources Usage="Actual">
+        <Resource DepartureOrArrival="Departure">
+          <AirportZone xsi:nil="true" />
+          <AircraftParkingPosition Qualifier="Gate">W14</AircraftParkingPosition>
+          <PassengerGate />
+          <Runway xsi:nil="true" />
+          <AircraftTerminal>4</AircraftTerminal>
+        </Resource>
+      </AirportResources>
+      <OperationTime OperationQualifier="SCL" CodeContext="2005" RepeatIndex="1" TimeType="">2024-12-04T10:00:00Z</OperationTime>
+      <AircraftInfo>
+        <AircraftType>320</AircraftType>
+        <AircraftSubType xsi:nil="true" />
+        <Registration>TSINK</Registration>
+        <TailNumber xsi:nil="true" />
+        <FleetNumber xsi:nil="true" />
+        <CallSign xsi:nil="true" />
+      </AircraftInfo>
+    </LegData>
+  </FlightLeg>
+</IATA_AIDX_FlightLegRS>
