@@ -1,0 +1,18 @@
+{
+    "DEL":"delayed",
+    "DX":"canceled",
+    "SCT":"on time",
+    "OFB":"departed",
+    "BST":"boarding",
+    "BEN":"final boarding",
+    "GCL":"gate closed",
+    "FCL":"flight closed",
+    "THM":"in range",
+    "TEN":"approach",
+    "LAN":"landed",
+    "ONB":"arrived",
+    "EAR":"early",
+    "DV":"flight diverted",
+    "RT":"re route",
+    "GRT":"ground return"
+}

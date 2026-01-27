@@ -1,0 +1,233 @@
+================================================================================
+DATA CLEANING SUMMARY REPORT
+================================================================================
+
+TASK: Clean flight dataset with operationtime and departureorarrival columns
+
+DATASET: flights_clean.csv
+OUTPUT: clean_operationtime_departure.csv
+
+================================================================================
+WHAT WAS DONE
+================================================================================
+
+1. OPERATIONTIME CLEANING
+   -------------------------
+   ✓ Parsed all values into valid datetime format (UTC)
+   ✓ Used pandas to_datetime() with UTC timezone
+   ✓ Invalid/malformed timestamps set to NULL (pd.NaT)
+   ✓ Valid timestamps preserved without modification
+   ✓ No inference or value changes made
+
+   RESULT:
+   - Total timestamps processed: 5,856
+   - Valid timestamps: 5,856 (100%)
+   - Invalid timestamps: 0 (0%)
+   - Data type: datetime64[ns, UTC]
+
+2. DERIVED FEATURES EXTRACTED
+   ---------------------------
+   From operationtime, extracted 4 new columns:
+
+   a) hour (0-23)
+      - Extracted using .dt.hour attribute
+      - Range: 0 to 23
+      - Non-null values: 5,856
+
+   b) weekday (Monday-Sunday)
+      - Extracted using .dt.day_name()
+      - Values found: Wednesday, Tuesday, Thursday
+      - Non-null values: 5,856
+
+   c) month (January-December)
+      - Extracted using .dt.month_name()
+      - Values found: December
+      - Non-null values: 5,856
+
+   d) date (YYYY-MM-DD)
+      - Extracted using .dt.date
+      - Format: YYYY-MM-DD (e.g., 2024-12-04)
+      - Non-null values: 5,856
+
+3. DEPARTUREORARRIVAL CLEANING
+   ----------------------------
+   ✓ Trimmed leading and trailing spaces using .str.strip()
+   ✓ Converted all values to uppercase using .str.upper()
+   ✓ Validated values: only ARRIVAL or DEPARTURE allowed
+   ✓ Invalid values replaced with NULL
+
+   RESULT:
+   - Original values: "Arrival", "Departure" (mixed case)
+   - After cleaning: "ARRIVAL", "DEPARTURE" (uppercase)
+   - ARRIVAL count: 2,787
+   - DEPARTURE count: 3,069
+   - Invalid values: 0
+   - NULL values: 0
+
+4. VALIDATION CHECKS
+   ------------------
+   ✓ No rows dropped (5,856 rows in → 5,856 rows out)
+   ✓ operationtime is datetime64[ns, UTC] compatible
+   ✓ departureorarrival contains only ARRIVAL, DEPARTURE, or NULL
+   ✓ All column values are consistent and standardized
+   ✓ Derived features correctly extracted for all valid timestamps
+
+5. RESTRICTIONS FOLLOWED
+   ----------------------
+   ✓ NO delay variables created
+   ✓ NO scheduled or estimated times inferred
+   ✓ NO value modifications beyond cleaning and standardization
+   ✓ NO row deletions during cleaning
+   ✓ NO guessing or inferring of missing values
+
+================================================================================
+PROOF & EVIDENCE
+================================================================================
+
+PROOF 1: ALL ROWS RETAINED
+---------------------------
+Original dataset rows: 5,856
+Final dataset rows: 5,856
+Rows dropped: 0
+
+WHY: The requirement stated "Keep rows even if one of the two features is 
+missing" and "Do not drop rows during cleaning". All rows were retained.
+
+PROOF 2: DATETIME COMPATIBILITY
+--------------------------------
+operationtime data type: datetime64[ns, UTC]
+All timestamps parsed successfully: 5,856/5,856 (100%)
+Format: ISO 8601 with UTC timezone (e.g., 2024-12-04 08:05:00+00:00)
+
+WHY: Pandas datetime64[ns, UTC] is a standard datetime-compatible type that 
+properly handles timezone-aware datetime values in UTC.
+
+PROOF 3: DERIVED FEATURES ACCURACY
+-----------------------------------
+Hour extraction:
+  - Range: 0-23 ✓ (correct 24-hour format)
+  - Example: "2024-12-04T08:05:00Z" → hour = 8 ✓
+
+Weekday extraction:
+  - Format: Full day names (Monday-Sunday) ✓
+  - Example: "2024-12-04T08:05:00Z" → weekday = Wednesday ✓
+
+Month extraction:
+  - Format: Full month names (January-December) ✓
+  - Example: "2024-12-04T08:05:00Z" → month = December ✓
+
+Date extraction:
+  - Format: YYYY-MM-DD ✓
+  - Example: "2024-12-04T08:05:00Z" → date = 2024-12-04 ✓
+
+WHY: All derived features use standard pandas datetime accessor methods 
+(.dt.hour, .dt.day_name(), .dt.month_name(), .dt.date) which guarantee 
+correct extraction from valid datetime objects.
+
+PROOF 4: STANDARDIZATION OF DEPARTUREORARRIVAL
+-----------------------------------------------
+Before cleaning:
+  - "Arrival" (mixed case)
+  - "Departure" (mixed case)
+  - Potentially whitespace around values
+
+After cleaning:
+  - "ARRIVAL" (uppercase only)
+  - "DEPARTURE" (uppercase only)
+  - No whitespace
+  - Only these 2 values present (no invalid values found)
+
+WHY: The cleaning process:
+1. .str.strip() removed all leading/trailing whitespace
+2. .str.upper() converted all to uppercase
+3. Lambda function validated values against ['ARRIVAL', 'DEPARTURE']
+4. Any other value would be replaced with None (NULL)
+
+PROOF 5: NO MODIFICATIONS BEYOND CLEANING
+------------------------------------------
+operationtime:
+  ✓ Parsed but not modified
+  ✓ Valid timestamps kept as-is
+  ✓ No time zone conversions beyond UTC parsing
+  ✓ No inference of missing values
+
+departureorarrival:
+  ✓ Only formatting changes (uppercase, trim)
+  ✓ No value inference
+  ✓ No assumptions about missing data
+
+WHY: The code only performs:
+- Parsing (to_datetime with UTC)
+- String formatting (.strip(), .upper())
+- Validation (replace invalid with NULL)
+- Feature extraction (from valid datetime only)
+
+No logic exists to:
+- Modify valid timestamps
+- Infer missing values
+- Create calculated fields (delays, etc.)
+- Change time values
+
+================================================================================
+VALIDATION RESULTS
+================================================================================
+
+FINAL DATASET STATISTICS:
+- Total rows: 5,856
+- Total columns: 14 (10 original + 4 derived)
+- NULL values in operationtime: 0
+- NULL values in departureorarrival: 0
+
+COLUMN BREAKDOWN:
+Original columns (10):
+  1. airline
+  2. flightnumber
+  3. departureairport
+  4. arrivalairport
+  5. origindate
+  6. operationtime (cleaned, datetime64[ns, UTC])
+  7. departureorarrival (cleaned, uppercase)
+  8. aircraftterminal
+  9. status
+  10. aircrafttype
+
+New derived columns (4):
+  11. hour (int32, range 0-23)
+  12. weekday (object, full day name)
+  13. month (object, full month name)
+  14. date (object, YYYY-MM-DD format)
+
+DATA QUALITY METRICS:
+- operationtime valid rate: 100% (5856/5856)
+- departureorarrival valid rate: 100% (5856/5856)
+- hour extraction success rate: 100% (5856/5856)
+- weekday extraction success rate: 100% (5856/5856)
+- month extraction success rate: 100% (5856/5856)
+- date extraction success rate: 100% (5856/5856)
+
+DISTRIBUTION INSIGHTS:
+- Hours: All 24 hours represented (0-23)
+- Weekdays: Wednesday (4,422), Tuesday (1,142), Thursday (292)
+- Months: December only (5,856)
+- ARRIVAL: 2,787 records (47.6%)
+- DEPARTURE: 3,069 records (52.4%)
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The dataset has been successfully cleaned according to all specifications:
+
+✓ operationtime parsed to UTC datetime (no invalid values found)
+✓ 4 derived features extracted (hour, weekday, month, date)
+✓ departureorarrival standardized to uppercase with validation
+✓ All 5,856 rows retained (no deletions)
+✓ No modifications beyond cleaning and standardization
+✓ No inference of missing values
+✓ Output is consistent and standardized
+
+OUTPUT FILE: clean_operationtime_departure.csv
+
+All requirements met. Data is ready for analysis.
+
+================================================================================
