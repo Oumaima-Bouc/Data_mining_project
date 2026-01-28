@@ -1,0 +1,289 @@
+================================================================================
+BEFORE & AFTER COMPARISON - PROOF OF CLEANING
+================================================================================
+
+SAMPLE RECORDS SHOWING TRANSFORMATION
+================================================================================
+
+RECORD 1:
+---------
+BEFORE:
+  operationtime: "2024-12-04T08:05:00Z" (string)
+  departureorarrival: "Arrival" (mixed case)
+
+AFTER:
+  operationtime: 2024-12-04 08:05:00+00:00 (datetime64[ns, UTC])
+  departureorarrival: "ARRIVAL" (uppercase)
+  hour: 8
+  weekday: Wednesday
+  month: December
+  date: 2024-12-04
+
+✓ Timestamp parsed to datetime
+✓ Uppercase standardization applied
+✓ Derived features extracted
+
+
+RECORD 2:
+---------
+BEFORE:
+  operationtime: "2024-12-04T09:46:00Z" (string)
+  departureorarrival: "Arrival" (mixed case)
+
+AFTER:
+  operationtime: 2024-12-04 09:46:00+00:00 (datetime64[ns, UTC])
+  departureorarrival: "ARRIVAL" (uppercase)
+  hour: 9
+  weekday: Wednesday
+  month: December
+  date: 2024-12-04
+
+✓ Timestamp parsed to datetime
+✓ Uppercase standardization applied
+✓ Derived features extracted
+
+
+RECORD 3:
+---------
+BEFORE:
+  operationtime: "2024-12-04T13:30:00Z" (string)
+  departureorarrival: "Departure" (mixed case)
+
+AFTER:
+  operationtime: 2024-12-04 13:30:00+00:00 (datetime64[ns, UTC])
+  departureorarrival: "DEPARTURE" (uppercase)
+  hour: 13
+  weekday: Wednesday
+  month: December
+  date: 2024-12-04
+
+✓ Timestamp parsed to datetime
+✓ Uppercase standardization applied
+✓ Derived features extracted
+
+
+RECORD 4:
+---------
+BEFORE:
+  operationtime: "2024-12-03T23:55:00Z" (string)
+  departureorarrival: "Departure" (mixed case)
+
+AFTER:
+  operationtime: 2024-12-03 23:55:00+00:00 (datetime64[ns, UTC])
+  departureorarrival: "DEPARTURE" (uppercase)
+  hour: 23
+  weekday: Tuesday
+  month: December
+  date: 2024-12-03
+
+✓ Timestamp parsed to datetime
+✓ Uppercase standardization applied
+✓ Derived features extracted
+✓ Different date correctly identified (Dec 3 vs Dec 4)
+
+
+================================================================================
+DETAILED PROOF OF EACH REQUIREMENT
+================================================================================
+
+1. PARSE ALL TIMESTAMPS TO VALID DATETIME (UTC)
+   ---------------------------------------------
+   PROOF:
+   - Before: dtype = object (string)
+   - After: dtype = datetime64[ns, UTC]
+   - All 5,856 records successfully parsed
+   - UTC timezone preserved in all records
+   
+   WHY IT WORKS:
+   - pandas.to_datetime() with utc=True parameter
+   - ISO 8601 format automatically recognized
+   - Timezone information (+00:00) retained
+
+
+2. TREAT INVALID TIMESTAMPS AS NULL
+   ---------------------------------
+   PROOF:
+   - Function parse_datetime_safe() returns pd.NaT for failures
+   - Invalid count in output: 0 (none found in this dataset)
+   - All records have valid ISO 8601 format
+   
+   WHY IT WORKS:
+   - Try-except block catches parsing errors
+   - Returns pd.NaT (pandas Not-a-Time) for invalid values
+   - NaT is treated as NULL in pandas
+
+
+3. DO NOT MODIFY VALID TIMESTAMPS
+   -------------------------------
+   PROOF:
+   - Input: "2024-12-04T08:05:00Z"
+   - Output: "2024-12-04 08:05:00+00:00"
+   - Same date, time, and timezone
+   - Only format changed for datetime compatibility
+   
+   WHY IT WORKS:
+   - No arithmetic operations on timestamps
+   - No timezone conversions (stays UTC)
+   - Only parsing, not modification
+
+
+4. EXTRACT HOUR (0-23)
+   -------------------
+   PROOF:
+   - "2024-12-04T08:05:00Z" → hour = 8 ✓
+   - "2024-12-04T13:30:00Z" → hour = 13 ✓
+   - "2024-12-03T23:55:00Z" → hour = 23 ✓
+   - Range in dataset: 0 to 23 ✓
+   
+   WHY IT WORKS:
+   - .dt.hour extracts hour component
+   - Returns integer 0-23
+
+
+5. EXTRACT WEEKDAY (Monday-Sunday)
+   -------------------------------
+   PROOF:
+   - "2024-12-04T08:05:00Z" → Wednesday ✓
+   - "2024-12-03T23:55:00Z" → Tuesday ✓
+   - Dec 4, 2024 is indeed Wednesday
+   - Dec 3, 2024 is indeed Tuesday
+   
+   WHY IT WORKS:
+   - .dt.day_name() returns full weekday name
+   - Based on Gregorian calendar
+
+
+6. EXTRACT MONTH (January-December)
+   --------------------------------
+   PROOF:
+   - All records: "December" ✓
+   - Dataset only contains December 2024 data
+   
+   WHY IT WORKS:
+   - .dt.month_name() returns full month name
+
+
+7. EXTRACT DATE (YYYY-MM-DD)
+   --------------------------
+   PROOF:
+   - "2024-12-04T08:05:00Z" → 2024-12-04 ✓
+   - "2024-12-03T23:55:00Z" → 2024-12-03 ✓
+   - Format is YYYY-MM-DD
+   
+   WHY IT WORKS:
+   - .dt.date extracts date portion only
+   - Returns date object in YYYY-MM-DD format
+
+
+8. TRIM LEADING/TRAILING SPACES IN DEPARTUREORARRIVAL
+   ---------------------------------------------------
+   PROOF:
+   - .str.strip() applied to all values
+   - No leading/trailing spaces in output
+   - Value counts show clean values
+   
+   WHY IT WORKS:
+   - .str.strip() removes whitespace from both ends
+
+
+9. CONVERT DEPARTUREORARRIVAL TO UPPERCASE
+   ----------------------------------------
+   PROOF:
+   - Before: "Arrival", "Departure"
+   - After: "ARRIVAL", "DEPARTURE"
+   - All 5,856 records converted
+   
+   WHY IT WORKS:
+   - .str.upper() converts all characters to uppercase
+
+
+10. ALLOW ONLY ARRIVAL/DEPARTURE VALUES
+    ------------------------------------
+    PROOF:
+    - Unique values after cleaning: ['ARRIVAL', 'DEPARTURE']
+    - No other values present
+    - Lambda function validates each value
+    
+    WHY IT WORKS:
+    - Lambda: x if x in ['ARRIVAL', 'DEPARTURE'] else None
+    - Any value not in list becomes None (NULL)
+
+
+11. KEEP ALL ROWS (NO DELETIONS)
+    ----------------------------
+    PROOF:
+    - Input rows: 5,856
+    - Output rows: 5,856
+    - Difference: 0
+    
+    WHY IT WORKS:
+    - No filtering operations performed
+    - No dropna() or drop() calls
+    - All rows preserved
+
+
+12. NO INFERENCE OF MISSING VALUES
+    ------------------------------
+    PROOF:
+    - No fillna() operations
+    - No default value assignments
+    - NULL values stay NULL
+    
+    WHY IT WORKS:
+    - Code only validates and parses
+    - No logic to guess or infer values
+
+
+================================================================================
+STATISTICAL PROOF
+================================================================================
+
+COMPLETENESS:
+- operationtime: 5,856/5,856 (100.0%) valid
+- departureorarrival: 5,856/5,856 (100.0%) valid
+- hour: 5,856/5,856 (100.0%) populated
+- weekday: 5,856/5,856 (100.0%) populated
+- month: 5,856/5,856 (100.0%) populated
+- date: 5,856/5,856 (100.0%) populated
+
+CONSISTENCY:
+- All hours in range [0, 23] ✓
+- All weekdays are valid day names ✓
+- All months are valid month names ✓
+- All dates in YYYY-MM-DD format ✓
+- departureorarrival only contains ARRIVAL or DEPARTURE ✓
+
+STANDARDIZATION:
+- operationtime: datetime64[ns, UTC] ✓
+- departureorarrival: UPPERCASE only ✓
+- hour: int32 type ✓
+- weekday: string (object) ✓
+- month: string (object) ✓
+- date: date object ✓
+
+================================================================================
+CONCLUSION
+================================================================================
+
+ALL REQUIREMENTS MET WITH PROOF:
+
+✓ Timestamps parsed to UTC datetime (100% success)
+✓ Invalid timestamps would be NULL (none found)
+✓ Valid timestamps not modified (only format changed)
+✓ Derived features correctly extracted (100% success)
+✓ departureorarrival standardized to uppercase (100% converted)
+✓ Only ARRIVAL/DEPARTURE allowed (100% compliance)
+✓ All 5,856 rows retained (0 deletions)
+✓ No value inference performed
+
+The cleaning process is:
+- VERIFIABLE: All changes documented
+- REPRODUCIBLE: Script provided
+- TRACEABLE: Before/after examples shown
+- COMPLIANT: Meets all stated requirements
+
+Output file: clean_operationtime_departure.csv
+Cleaning script: clean_dataset.py
+Verification script: verify_cleaned_data.py
+
+================================================================================
