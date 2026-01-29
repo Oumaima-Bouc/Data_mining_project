@@ -1,0 +1,90 @@
+================================================================================
+DATA CLEANING SUMMARY REPORT - AIRPORTS AND DATES
+================================================================================
+
+Input file: c:\Users\KOTEK INFORMATIQUE\Desktop\w9\Data_mining_project\data\raw\flights_clean.csv
+Output file: c:\Users\KOTEK INFORMATIQUE\Desktop\w9\Data_mining_project\data\processed\flights_cleaned_airports_dates.csv
+Cleaning date: 2026-01-29 01:26:10
+
+================================================================================
+WHAT WAS DONE
+================================================================================
+
+1. DEPARTUREAIRPORT CLEANING
+   --------------------------------------------------
+   [DONE] Stripped leading and trailing whitespace
+   [DONE] Converted all values to uppercase
+   [DONE] Validated IATA airport codes (3 characters)
+   [WARNING] Found 1 non-standard code: KRECHBA (kept for review)
+   [DONE] Result: 74 unique airport codes
+
+2. ARRIVALAIRPORT CLEANING
+   --------------------------------------------------
+   [DONE] Stripped leading and trailing whitespace
+   [DONE] Converted all values to uppercase
+   [DONE] Validated IATA airport codes (3 characters)
+   [DONE] All codes conform to IATA standard
+   [DONE] Result: 70 unique airport codes
+
+3. ORIGINDATE CLEANING
+   --------------------------------------------------
+   [DONE] Validated date format consistency
+   [DONE] Parsed dates using pandas.to_datetime()
+   [DONE] Standardized output format to YYYY-MM-DD
+   [DONE] Verified chronological validity
+   [DONE] Date range: 2024-12-03 to 2024-12-05
+
+4. DUPLICATE REMOVAL
+   --------------------------------------------------
+   - Original rows: 5856
+   - Duplicate rows found: 4780 (81.6%)
+   - Unique rows retained: 1076
+   - Average duplicates per flight: 5.4
+   - Maximum duplicates for one flight: 33
+   [DONE] Method: Kept first occurrence of each duplicate
+   [DONE] Reason: Data likely contains multiple status updates/polling
+
+================================================================================
+FINAL STATISTICS
+================================================================================
+
+Dataset size:
+  Before: 5856 rows × 10 columns
+  After:  1076 rows × 10 columns
+  Reduction: 4780 rows (81.6%)
+
+Data quality:
+  NULL values: 0 in all three columns
+  IATA compliance: 1076/1076 (100%) for arrivals
+  Date validity: 100%
+  Format consistency: 100%
+
+Top airports:
+  Departure: {'ALG': 565, 'CDG': 61, 'IST': 32, 'HME': 28, 'ORN': 26}
+  Arrival: {'ALG': 511, 'CDG': 50, 'ORN': 34, 'IST': 34, 'CZL': 33}
+
+================================================================================
+WHY SO MANY DUPLICATES?
+================================================================================
+
+The high duplicate rate (81.6%) is NORMAL for flight tracking data:
+
+1. Status Updates: Flights are tracked through multiple states
+   - Scheduled -> Boarding -> Departed -> En Route -> Landed
+   - Each state change creates a new record
+
+2. Polling/Refresh: Data collection systems poll at intervals
+   - System queries flight status every X minutes
+   - Creates snapshot records even if status unchanged
+
+3. System Synchronization: Multiple data sources
+   - Airport systems, airline systems, radar data
+   - Synchronization can create duplicate entries
+
+CONCLUSION: Removing these duplicates is CORRECT and necessary
+for accurate analysis. We keep the first occurrence which
+represents the initial detection of each unique flight.
+
+================================================================================
+END OF REPORT
+================================================================================
